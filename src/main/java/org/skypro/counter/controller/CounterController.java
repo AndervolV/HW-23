@@ -30,4 +30,5 @@ public class CounterController {
                             @RequestParam("lastName") String lastName) {
         return "Hello, " + name + " " + lastName;
     }
+
 }
