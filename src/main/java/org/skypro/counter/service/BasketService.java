@@ -5,6 +5,7 @@ import org.skypro.counter.model.basket.ProductBasket;
 import org.skypro.counter.model.basket.UserBasket;
 import org.skypro.counter.model.product.Product;
 import org.springframework.stereotype.Service;
+import org.skypro.counter.exception.NoSuchProductException;
 
 import java.util.*;
 
@@ -21,7 +22,7 @@ public class BasketService {
     public void addProductToBasket(UUID productId) {
         Optional<Product> productOpt = storageService.getProductById(productId);
         if (productOpt.isEmpty()) {
-            throw new IllegalArgumentException("Продукт с ID " + productId + " не найден");
+            throw new NoSuchProductException("Продукт с ID " + productId + " не найден");
         }
         productBasket.addProduct(productId);
     }

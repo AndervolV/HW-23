@@ -2,7 +2,7 @@ package org.skypro.counter.service;
 
 import org.skypro.counter.model.product.Product;
 import org.springframework.stereotype.Service;
-
+import org.skypro.counter.exception.NoSuchProductException;
 import java.util.UUID;
 
 @Service
@@ -14,10 +14,8 @@ public class ProductService {
     }
 
     public int getProductPrice(UUID productId) {
-        return storageService.getAllProducts().stream()
-                .filter(p -> p.getId().equals(productId))
-                .findFirst()
-                .map(Product::getPrice)
-                .orElse(0);
+        return storageService.getProductById(productId)
+                .orElseThrow(() -> new NoSuchProductException("Продукт с ID " + productId + " не найден"))
+                .getPrice();
     }
 }
