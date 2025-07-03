@@ -1,4 +1,3 @@
-
 package org.skypro.counter.service;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.skypro.counter.model.search.Searchable;
 import org.skypro.counter.model.search.SearchResult;
-
+import org.skypro.counter.model.article.Article;
+import org.skypro.counter.model.product.SimpleProduct;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -25,31 +25,7 @@ class SearchServiceTest {
         searchService = new SearchService(storageService);
     }
 
-    private Searchable createSearchable(String name, String contentType, String searchTerm) {
-        return new Searchable() {
-            private final UUID id = UUID.randomUUID();
 
-            @Override
-            public String getSearchTerm() {
-                return searchTerm;
-            }
-
-            @Override
-            public String getContentType() {
-                return contentType;
-            }
-
-            @Override
-            public String getName() {
-                return name;
-            }
-
-            @Override
-            public UUID getId() {
-                return id;
-            }
-        };
-    }
 
     @Test
     void search_whenStorageIsEmpty_returnsEmptyList() {
@@ -60,30 +36,29 @@ class SearchServiceTest {
         assertTrue(results.isEmpty(), "Результат поиска должен быть пустым, когда в хранилище нет объектов");
         verify(storageService).getAllSearchables();
     }
-
     @Test
     void search_whenNoMatchingObjects_returnsEmptyList() {
-        Searchable s1 = createSearchable("Apple", "PRODUCT", "Apple iPhone");
-        Searchable s2 = createSearchable("Banana", "PRODUCT", "Yellow banana");
+        SimpleProduct product1 = new SimpleProduct(UUID.randomUUID(), "Apple", 100);
+        SimpleProduct product2 = new SimpleProduct(UUID.randomUUID(), "Banana", 200);
 
-        when(storageService.getAllSearchables()).thenReturn(List.of(s1, s2));
+        when(storageService.getAllSearchables()).thenReturn(List.of(product1, product2));
 
         Collection<SearchResult> results = searchService.search("Orange");
 
-        assertTrue(results.isEmpty(), "Результат поиска должен быть пустым, если нет подходящих объектов");
+        assertTrue(results.isEmpty());
     }
 
     @Test
     void search_whenMatchingObjectExists_returnsResult() {
-        Searchable s1 = createSearchable("Apple", "PRODUCT", "Apple iPhone");
-        Searchable s2 = createSearchable("Banana", "PRODUCT", "Yellow banana");
+        SimpleProduct product1 = new SimpleProduct(UUID.randomUUID(), "Apple", 100);
+        SimpleProduct product2 = new SimpleProduct(UUID.randomUUID(), "Banana", 200);
 
-        when(storageService.getAllSearchables()).thenReturn(List.of(s1, s2));
+        when(storageService.getAllSearchables()).thenReturn(List.of(product1, product2));
 
         Collection<SearchResult> results = searchService.search("Apple");
 
-        assertFalse(results.isEmpty(), "Результат поиска не должен быть пустым, если есть подходящие объекты");
-        assertEquals(1, results.size(), "Должен быть один результат");
+        assertFalse(results.isEmpty());
+        assertEquals(1, results.size());
         SearchResult result = results.iterator().next();
         assertEquals("Apple", result.getName());
         assertEquals("PRODUCT", result.getContentType());
@@ -91,14 +66,14 @@ class SearchServiceTest {
 
     @Test
     void search_whenMultipleMatches_returnsAllMatches() {
-        Searchable s1 = createSearchable("Apple", "PRODUCT", "Apple iPhone");
-        Searchable s2 = createSearchable("Green Apple", "PRODUCT", "Green Apple");
-        Searchable s3 = createSearchable("Banana", "PRODUCT", "Yellow banana");
+        SimpleProduct product1 = new SimpleProduct(UUID.randomUUID(), "Apple", 100);
+        SimpleProduct product2 = new SimpleProduct(UUID.randomUUID(), "Green Apple", 150);
+        SimpleProduct product3 = new SimpleProduct(UUID.randomUUID(), "Banana", 200);
 
-        when(storageService.getAllSearchables()).thenReturn(List.of(s1, s2, s3));
+        when(storageService.getAllSearchables()).thenReturn(List.of(product1, product2, product3));
 
         Collection<SearchResult> results = searchService.search("Apple");
 
-        assertEquals(2, results.size(), "Должны быть два результата по поиску 'Apple'");
+        assertEquals(2, results.size());
     }
 }
