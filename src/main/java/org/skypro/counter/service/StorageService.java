@@ -25,14 +25,16 @@ public class StorageService {
     }
 
     private void addTestProducts() {
-        products.put(UUID.randomUUID(), new Product(UUID.randomUUID(), "Ноутбук") {
+        UUID productId1 = UUID.randomUUID();
+        products.put(productId1, new Product(productId1, "Ноутбук") {
             @Override
             public int getPrice() {
                 return 50000;
             }
         });
 
-        products.put(UUID.randomUUID(), new Product(UUID.randomUUID(), "Телефон") {
+        UUID productId2 = UUID.randomUUID();
+        products.put(productId2, new Product(productId2, "Телефон") {
             @Override
             public int getPrice() {
                 return 30000;
@@ -53,5 +55,8 @@ public class StorageService {
 
     public List<Article> getAllArticles() {
         return new ArrayList<>(articles.values());
+    }
+    public Optional<Product> getProductById(UUID id) {
+        return Optional.ofNullable(products.get(id));
     }
 }
